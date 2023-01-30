@@ -39,6 +39,7 @@ use (
 	./logs-logs-logs
 	./luhn
 	./matrix
+	./meetup
 	./meteorology
 	./need-for-speed
 	./nth-prime
