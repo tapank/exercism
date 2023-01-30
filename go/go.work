@@ -49,6 +49,7 @@ use (
 	./parsing-log-files
 	./party-robot
 	./perfect-numbers
+	./phone-number
 	./protein-translation
 	./proverb
 	./pythagorean-triplet
