@@ -1,4 +1,4 @@
-package prime
+package nprime
 
 import "errors"
 

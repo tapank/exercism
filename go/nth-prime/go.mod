@@ -1,3 +1,3 @@
-module prime
+module nprime
 
 go 1.16
