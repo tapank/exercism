@@ -36,6 +36,7 @@ use (
 	./largest-series-product
 	./lasagna
 	./leap
+	./ledger
 	./logs-logs-logs
 	./luhn
 	./matrix
