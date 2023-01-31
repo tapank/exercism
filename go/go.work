@@ -50,6 +50,7 @@ use (
 	./party-robot
 	./perfect-numbers
 	./phone-number
+	./pig-latin
 	./prime-factors
 	./protein-translation
 	./proverb
