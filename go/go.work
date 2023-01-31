@@ -50,6 +50,7 @@ use (
 	./party-robot
 	./perfect-numbers
 	./phone-number
+	./prime-factors
 	./protein-translation
 	./proverb
 	./pythagorean-triplet
