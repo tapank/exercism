@@ -4,8 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strconv"
-	"strings"
+	"time"
 )
 
 type Entry struct {
@@ -14,33 +13,57 @@ type Entry struct {
 	Change      int // in cents
 }
 
+var headerFmt = "%-10s | %-25s | %s\n"
+var headerFields = map[string][]string{
+	"nl-NL": {"Datum", "Omschrijving", "Verandering"},
+	"en-US": {"Date", "Description", "Change"},
+}
+
+// currenty symbols
+var currencySymbols = map[string]string{
+	"EUR": "€",
+	"USD": "$",
+}
+
+// all the separators needed to format an amount by locale
+type NumFormat struct {
+	prefix        string
+	tsep, decimal rune
+}
+
+// the amount number separators for locales
+var separators = map[string]NumFormat{
+	"nl-NL": {" ", '.', ','},
+	"en-US": {"", ',', '.'},
+}
+
+// date formats for locales.
+var dateFormat = map[string]string{
+	"nl-NL": "02-01-2006",
+	"en-US": "01/02/2006",
+}
+
+// FormatLedger formats given entries based on given locale and currency.
+// To add support for new currencies and locales, update the date formats,
+// separators, currency symbols.
 func FormatLedger(currency string, locale string, entries []Entry) (out string, err error) {
-	var s string
-
-	if currency == "" {
-		err = errors.New("empty currency")
-		return
-	}
-	if currency != "EUR" && currency != "USD" {
-		err = errors.New("invalid currency")
+	// get header. this also validates locale.
+	if out, err = header(locale); err != nil {
 		return
 	}
 
-	// header
-	headerFmt := "%-10s | %-25s | %s\n"
-	switch locale {
-	case "nl-NL":
-		s = fmt.Sprintf(headerFmt, "Datum", "Omschrijving", "Verandering")
-	case "en-US":
-		s = fmt.Sprintf(headerFmt, "Date", "Description", "Change")
-	default:
-		err = errors.New("unsupported locale")
+	// validate currency
+	if _, ok := currencySymbols[currency]; !ok {
+		if currency == "" {
+			err = errors.New("empty currency")
+		} else {
+			err = errors.New("invalid currency")
+		}
 		return
 	}
 
 	// create a copy in order to not modify the input array
-	var es []Entry
-	es = append(es, entries...)
+	es := append([]Entry{}, entries...)
 
 	// sort entries by date, description, and change
 	sort.Slice(es, func(i, j int) bool {
@@ -54,118 +77,77 @@ func FormatLedger(currency string, locale string, entries []Entry) (out string, 
 		return ies.Change < jes.Change
 	})
 
-	ss := make([]string, len(es))
-	for i, entry := range es {
-		if len(entry.Date) != 10 {
-			return "", errors.New("")
-		}
-		d1, d2, d3, d4, d5 := entry.Date[0:4], entry.Date[4], entry.Date[5:7], entry.Date[7], entry.Date[8:10]
-		if d2 != '-' {
-			return "", errors.New("")
-		}
-		if d4 != '-' {
-			return "", errors.New("")
-		}
-		de := entry.Description
-		if len(de) > 25 {
-			de = de[:22] + "..."
+	// format each entry and add to output string
+	for _, entry := range es {
+		// parse and format date
+		var datestr string
+		var t time.Time
+		if t, err = time.Parse("2006-01-02", entry.Date); err != nil {
+			return
 		} else {
-			de = de + strings.Repeat(" ", 25-len(de))
+			datestr = t.Format(dateFormat[locale])
 		}
-		var d string
-		if locale == "nl-NL" {
-			d = d5 + "-" + d3 + "-" + d1
-		} else if locale == "en-US" {
-			d = d3 + "/" + d5 + "/" + d1
+
+		description := entry.Description
+		if len(description) > 25 {
+			description = description[:22] + "..."
 		}
-		negative := false
-		cents := entry.Change
-		if cents < 0 {
-			cents = cents * -1
-			negative = true
+		var amount string
+		if amount, err = formatCurrency(entry.Change, currency, locale); err != nil {
+			return
 		}
-		var a string
-		if locale == "nl-NL" {
-			if currency == "EUR" {
-				a += "€"
-			} else if currency == "USD" {
-				a += "$"
-			}
-			a += " "
-			centsStr := strconv.Itoa(cents)
-			switch len(centsStr) {
-			case 1:
-				centsStr = "00" + centsStr
-			case 2:
-				centsStr = "0" + centsStr
-			}
-			rest := centsStr[:len(centsStr)-2]
-			var parts []string
-			for len(rest) > 3 {
-				parts = append(parts, rest[len(rest)-3:])
-				rest = rest[:len(rest)-3]
-			}
-			if len(rest) > 0 {
-				parts = append(parts, rest)
-			}
-			for i := len(parts) - 1; i >= 0; i-- {
-				a += parts[i] + "."
-			}
-			a = a[:len(a)-1]
-			a += ","
-			a += centsStr[len(centsStr)-2:]
-			if negative {
-				a += "-"
-			} else {
-				a += " "
-			}
-		} else if locale == "en-US" {
-			if negative {
-				a += "("
-			}
-			if currency == "EUR" {
-				a += "€"
-			} else if currency == "USD" {
-				a += "$"
-			}
-			centsStr := strconv.Itoa(cents)
-			switch len(centsStr) {
-			case 1:
-				centsStr = "00" + centsStr
-			case 2:
-				centsStr = "0" + centsStr
-			}
-			rest := centsStr[:len(centsStr)-2]
-			var parts []string
-			for len(rest) > 3 {
-				parts = append(parts, rest[len(rest)-3:])
-				rest = rest[:len(rest)-3]
-			}
-			if len(rest) > 0 {
-				parts = append(parts, rest)
-			}
-			for i := len(parts) - 1; i >= 0; i-- {
-				a += parts[i] + ","
-			}
-			a = a[:len(a)-1]
-			a += "."
-			a += centsStr[len(centsStr)-2:]
-			if negative {
-				a += ")"
-			} else {
-				a += " "
-			}
-		}
-		var al int
-		for range a {
-			al++
-		}
-		ss[i] = d + strings.Repeat(" ", 10-len(d)) + " | " + de + " | " +
-			strings.Repeat(" ", 13-al) + a + "\n"
+		out += fmt.Sprintf("%10s | %-25s | %13s\n", datestr, description, amount)
 	}
-	for i := 0; i < len(es); i++ {
-		s += ss[i]
+	return
+}
+
+// header creates a header for a given locale
+func header(locale string) (out string, err error) {
+	if fields, ok := headerFields[locale]; ok {
+		out = fmt.Sprintf(headerFmt, fields[0], fields[1], fields[2])
+		return
 	}
-	fmt.Println(s)
-	return s, nil
+	err = errors.New("unsupported locale")
+	return
+}
+
+// formatCurrency stringifies amount based on locale and currency.
+// handling of negative amounts needs improvement (I am not proud).
+func formatCurrency(cents int, currency, locale string) (out string, err error) {
+	// establish the number formatting separators
+	var tsep, dec rune
+	var prefix string
+	if numSep, ok := separators[locale]; ok {
+		tsep, dec = numSep.tsep, numSep.decimal
+		prefix = numSep.prefix
+	} else {
+		err = errors.New("invalid locale")
+		return
+	}
+
+	// remember the sign and make cents positive
+	var isNeg bool
+	if cents < 0 {
+		isNeg = true
+		cents = -cents
+	}
+
+	// now convert the amount to string
+	units, change := cents/100, cents%100
+	out = fmt.Sprintf("%c%02d", dec, change)
+	for units/1000 > 0 {
+		out = fmt.Sprintf("%c%03d%s", tsep, units%1000, out)
+		units /= 1000
+	}
+	out = fmt.Sprintf("%s%s%d%s", currencySymbols[currency], prefix, units, out)
+	if isNeg {
+		if tsep == ',' {
+			out = "(" + out + ")"
+		} else {
+			out += "-"
+		}
+	} else {
+		out += " "
+	}
+	return
 }
