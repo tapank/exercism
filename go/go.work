@@ -37,6 +37,7 @@ use (
 	./lasagna
 	./leap
 	./ledger
+	./linked-list
 	./logs-logs-logs
 	./luhn
 	./matrix
