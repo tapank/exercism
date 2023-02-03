@@ -57,6 +57,7 @@ use (
 	./protein-translation
 	./proverb
 	./pythagorean-triplet
+	./rail-fence-cipher
 	./raindrops
 	./reverse-string
 	./rna-transcription
