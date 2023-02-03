@@ -11,6 +11,7 @@ use (
 	./atbash-cipher
 	./bank-account
 	./binary-search
+	./binary-search-tree
 	./bird-watcher
 	./blackjack
 	./booking-up-for-beauty
