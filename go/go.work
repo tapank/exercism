@@ -42,6 +42,7 @@ use (
 	./linked-list
 	./logs-logs-logs
 	./luhn
+	./matching-brackets
 	./matrix
 	./meetup
 	./meteorology
