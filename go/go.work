@@ -81,6 +81,7 @@ use (
 	./tree-building
 	./triangle
 	./twelve-days
+	./two-bucket
 	./two-fer
 	./variable-length-quantity
 	./vehicle-purchase
