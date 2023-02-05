@@ -90,4 +90,5 @@ use (
 	./weather-forecast
 	./welcome-to-tech-palace
 	./word-count
+	./wordy
 )
