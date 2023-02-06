@@ -49,6 +49,7 @@ use (
 	./need-for-speed
 	./nth-prime
 	./nucleotide-count
+	./palindrome-products
 	./pangram
 	./parallel-letter-frequency
 	./parsing-log-files
