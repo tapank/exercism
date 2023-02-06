@@ -21,6 +21,7 @@ use (
 	./chessboard
 	./clock
 	./crypto-square
+	./diamond
 	./difference-of-squares
 	./diffie-hellman
 	./election-day
