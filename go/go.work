@@ -35,6 +35,7 @@ use (
 	./interest-is-interesting
 	./isbn-verifier
 	./isogram
+	./kindergarten-garden
 	./largest-series-product
 	./lasagna
 	./leap
