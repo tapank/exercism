@@ -39,41 +39,38 @@ func Say(n int64) (string, bool) {
 	if n < 0 || n > 999_999_999_999 {
 		return "", false
 	}
+	if n == 0 {
+		return "zero", true
+	}
+
 	var word string
-	word = SayInt(int(n % 1000))
-	n /= 1000
-	if n == 0 {
+	// numbers upto thousand
+	if word, n = SayInt(int(n%1000)), n/1000; n == 0 {
 		return word, true
-	}
-	if word == "zero" {
-		if n%1000 > 0 {
-			word = SayInt(int(n%1000)) + " thousand"
-		}
-	} else {
-		if n%1000 > 0 {
-			word = SayInt(int(n%1000)) + " thousand " + word
-		}
 	}
 
-	n /= 1000
-	if n == 0 {
-		return word, true
+	// numbers upto million
+	if word == "" && n%1000 > 0 {
+		word = SayInt(int(n%1000)) + " thousand"
+	} else if n%1000 > 0 {
+		word = SayInt(int(n%1000)) + " thousand " + word
 	}
-	if word == "zero" {
-		if n%1000 > 0 {
-			word = SayInt(int(n%1000)) + " million"
-		}
-	} else {
-		if n%1000 > 0 {
-			word = SayInt(int(n%1000)) + " million " + word
-		}
+	if n /= 1000; n == 0 {
+		return word, true
 	}
 
-	n /= 1000
-	if n == 0 {
+	// numbers upto billion
+	if word == "" && n%1000 > 0 {
+		word = SayInt(int(n%1000)) + " million"
+	} else if n%1000 > 0 {
+		word = SayInt(int(n%1000)) + " million " + word
+	}
+	if n /= 1000; n == 0 {
 		return word, true
 	}
-	if word == "zero" {
+
+	// numbers upto trillion
+	if word == "" {
 		word = SayInt(int(n%1000)) + " billion"
 	} else {
 		word = SayInt(int(n%1000)) + " billion " + word
@@ -81,10 +78,8 @@ func Say(n int64) (string, bool) {
 	return word, true
 }
 
+// SayInt works for numbers upto thousand (not inclusive)
 func SayInt(n int) string {
-	if n == 0 {
-		return "zero"
-	}
 	var word string
 	if n%100 > 0 && n%100 < 20 {
 		word = units[n%100]
