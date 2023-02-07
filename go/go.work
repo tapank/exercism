@@ -98,4 +98,5 @@ use (
 	./welcome-to-tech-palace
 	./word-count
 	./wordy
+	./yacht
 )
