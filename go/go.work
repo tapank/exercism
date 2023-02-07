@@ -30,6 +30,7 @@ use (
 	./etl
 	./expenses
 	./grains
+	./grep
 	./gross-store
 	./hamming
 	./hello-world
