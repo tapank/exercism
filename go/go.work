@@ -57,6 +57,7 @@ use (
 	./parallel-letter-frequency
 	./parsing-log-files
 	./party-robot
+	./pascals-triangle
 	./perfect-numbers
 	./phone-number
 	./pig-latin
