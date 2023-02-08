@@ -85,6 +85,7 @@ use (
 	./sorting-room
 	./space-age
 	./strain
+	./sublist
 	./sum-of-multiples
 	./the-farm
 	./tournament
