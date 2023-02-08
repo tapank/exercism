@@ -15,6 +15,7 @@ use (
 	./bird-watcher
 	./blackjack
 	./booking-up-for-beauty
+	./bowling
 	./card-tricks
 	./cars-assemble
 	./census
