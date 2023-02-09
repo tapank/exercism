@@ -15,6 +15,7 @@ use (
 	./binary-search-tree
 	./bird-watcher
 	./blackjack
+	./bob
 	./booking-up-for-beauty
 	./bowling
 	./card-tricks
