@@ -90,6 +90,7 @@ use (
 	./simple-cipher
 	./sorting-room
 	./space-age
+	./spiral-matrix
 	./strain
 	./sublist
 	./sum-of-multiples
