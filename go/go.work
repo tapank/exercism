@@ -89,6 +89,7 @@ use (
 	./sum-of-multiples
 	./the-farm
 	./tournament
+	./transpose
 	./tree-building
 	./triangle
 	./twelve-days
