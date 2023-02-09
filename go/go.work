@@ -23,6 +23,7 @@ use (
 	./chessboard
 	./clock
 	./crypto-square
+	./darts
 	./diamond
 	./difference-of-squares
 	./diffie-hellman
