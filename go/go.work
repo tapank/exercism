@@ -44,6 +44,7 @@ use (
 	./leap
 	./ledger
 	./linked-list
+	./list-ops
 	./logs-logs-logs
 	./luhn
 	./matching-brackets
