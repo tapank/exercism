@@ -33,6 +33,7 @@ use (
 	./error-handling
 	./etl
 	./expenses
+	./flatten-array
 	./grains
 	./grep
 	./gross-store
