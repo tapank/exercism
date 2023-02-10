@@ -110,6 +110,7 @@ use (
 	./weather-forecast
 	./welcome-to-tech-palace
 	./word-count
+	./word-search
 	./wordy
 	./yacht
 )
