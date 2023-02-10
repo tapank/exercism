@@ -35,6 +35,7 @@ use (
 	./etl
 	./expenses
 	./flatten-array
+	./gigasecond
 	./grains
 	./grep
 	./gross-store
