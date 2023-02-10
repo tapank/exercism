@@ -22,6 +22,7 @@ use (
 	./cars-assemble
 	./census
 	./chessboard
+	./circular-buffer
 	./clock
 	./crypto-square
 	./darts
