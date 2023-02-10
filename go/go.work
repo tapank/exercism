@@ -17,6 +17,7 @@ use (
 	./blackjack
 	./bob
 	./booking-up-for-beauty
+	./bottle-song
 	./bowling
 	./card-tricks
 	./cars-assemble
