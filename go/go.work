@@ -38,6 +38,7 @@ use (
 	./expenses
 	./flatten-array
 	./gigasecond
+	./grade-school
 	./grains
 	./grep
 	./gross-store
