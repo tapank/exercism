@@ -26,6 +26,7 @@ use (
 	./circular-buffer
 	./clock
 	./crypto-square
+	./custom-set
 	./darts
 	./diamond
 	./difference-of-squares

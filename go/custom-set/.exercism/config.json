@@ -1,0 +1,33 @@
+{
+  "authors": [],
+  "contributors": [
+    "alebaffa",
+    "bitfield",
+    "ekingery",
+    "ferhatelmas",
+    "hilary",
+    "JensChrG",
+    "kytrinyx",
+    "leenipper",
+    "petertseng",
+    "robphoenix",
+    "sebito91",
+    "soniakeys",
+    "eklatzer"
+  ],
+  "files": {
+    "solution": [
+      "custom_set.go"
+    ],
+    "test": [
+      "custom_set_test.go"
+    ],
+    "example": [
+      ".meta/example.go"
+    ],
+    "editor": [
+      "cases_test.go"
+    ]
+  },
+  "blurb": "Create a custom set type."
+}
