@@ -93,6 +93,7 @@ use (
 	./series
 	./sieve
 	./simple-cipher
+	./simple-linked-list
 	./sorting-room
 	./space-age
 	./spiral-matrix
