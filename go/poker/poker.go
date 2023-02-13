@@ -8,10 +8,11 @@ import (
 )
 
 type Hand struct {
-	cards    []Card
-	suites   map[Suite]int
-	ranks    map[int]int
-	handrank int
+	cards          []Card
+	suites         map[Suite]int
+	ranks          map[int]int
+	primaryscore   int
+	secondaryscore int
 }
 
 type Card struct {
@@ -117,8 +118,8 @@ func (h *Hand) isStraightFlush() bool {
 		}
 	}
 	for rank := range h.ranks {
-		if rank > int(h.handrank) {
-			h.handrank = rank
+		if rank > int(h.primaryscore) {
+			h.primaryscore = rank
 		}
 	}
 	return true
@@ -134,6 +135,12 @@ func BestHand(hands []string) ([]string, error) {
 	if best, ok := checkStraightFlush(allhands); ok {
 		return best, nil
 	}
+	if best, ok := checkFourOfAKind(allhands); ok {
+		return best, nil
+	}
+	if best, ok := checkFullHouse(allhands); ok {
+		return best, nil
+	}
 
 	// fmt.Println("************hurray! Here are the hands")
 	// fmt.Println(allhands)
@@ -142,45 +149,141 @@ func BestHand(hands []string) ([]string, error) {
 }
 
 func checkStraightFlush(hands map[*Hand]string) ([]string, bool) {
-	best := []string{}
-	ok := false
-
 	// pick out straight flush hands and find the highest score
-	bestHands := []*Hand{}
-	bestScore := 0
+	besthands := []*Hand{}
+	bestscore := 0
 	for hand := range hands {
 		if hand.isStraightFlush() {
-			bestHands = append(bestHands, hand)
-			if hand.handrank > bestScore {
-				bestScore = hand.handrank
+			besthands = append(besthands, hand)
+			if hand.primaryscore > bestscore {
+				bestscore = hand.primaryscore
 			}
 		}
 	}
+	return pickTopHands(besthands, bestscore, hands)
+}
 
-	// pick out the best scoring hand; there may be more than one
-	for _, hand := range bestHands {
-		if hand.handrank == bestScore {
-			best = append(best, hands[hand])
-			ok = true
+func checkFourOfAKind(hands map[*Hand]string) ([]string, bool) {
+	besthands := []*Hand{}
+	pbest := 0
+	sbest := 0
+
+	// pick out four of a kind hands and find the highest score
+	for hand := range hands {
+		for rank, count := range hand.ranks {
+			if count == 4 {
+				hand.primaryscore = rank
+				besthands = append(besthands, hand)
+				if rank > pbest {
+					pbest = rank
+				}
+			} else if len(hands) == 2 && count == 1 {
+				hand.secondaryscore = rank
+				if rank > sbest {
+					sbest = rank
+				}
+			}
 		}
 	}
-	return best, ok
+	return pickTopHands(besthands, pbest, hands)
+}
+
+func checkFullHouse(hands map[*Hand]string) ([]string, bool) {
+	besthands := []*Hand{}
+	pbest := 0
+	sbest := 0
+
+	// pick out four of a kind hands and find the highest score
+	for hand := range hands {
+		for rank, count := range hand.ranks {
+			if len(hands) == 2 && count == 3 {
+				hand.primaryscore = rank
+				besthands = append(besthands, hand)
+				if rank > pbest {
+					pbest = rank
+				}
+			} else if len(hands) == 2 && count == 2 {
+				hand.secondaryscore = rank
+				if rank > sbest {
+					sbest = rank
+				}
+			}
+		}
+	}
+	return pickTopHands(besthands, pbest, hands)
+}
+
+func checkFlush(hands map[*Hand]string) ([]string, bool) {
+	besthands := []*Hand{}
+	pbest := 0
+	sbest := 0
+
+	// pick out four of a kind hands and find the highest score
+	for hand := range hands {
+		if len(hand.suites) > 1 {
+			break
+		}
+		for rank, count := range hand.ranks {
+			if len(hands) == 2 && count == 3 {
+				hand.primaryscore = rank
+				besthands = append(besthands, hand)
+				if rank > pbest {
+					pbest = rank
+				}
+			} else if len(hands) == 2 && count == 2 {
+				hand.secondaryscore = rank
+				if rank > sbest {
+					sbest = rank
+				}
+			}
+		}
+	}
+	return pickTopHands(besthands, pbest, hands)
+}
+
+// pick out the best scoring hand; there may be more than one
+func pickTopHands(besthands []*Hand, pbest int, hands map[*Hand]string) ([]string, bool) {
+	if pbest == 0 {
+		return nil, false
+	}
+	bestbyprimary := []*Hand{}
+	var sbest int
+	for _, hand := range besthands {
+		if hand.primaryscore == pbest {
+			bestbyprimary = append(bestbyprimary, hand)
+			if hand.secondaryscore > sbest {
+				sbest = hand.secondaryscore
+			}
+		}
+	}
+	besthands = bestbyprimary
+	bestbysecondary := []*Hand{}
+	if len(bestbyprimary) > 1 {
+		for _, hand := range bestbyprimary {
+			if hand.secondaryscore == sbest {
+				bestbysecondary = append(bestbysecondary, hand)
+			}
+		}
+		besthands = bestbysecondary
+	}
+
+	best := []string{}
+	for _, hand := range besthands {
+		if hand.primaryscore == pbest && hand.secondaryscore == sbest {
+			best = append(best, hands[hand])
+		}
+	}
+	return best, true
 }
 
 func parse(hands []string) (map[*Hand]string, error) {
 	allhands := make(map[*Hand]string, len(hands))
-	allcards := make(map[Card]struct{})
 	for _, hand := range hands {
 		cards := make([]Card, 0, 5)
 		for _, cardname := range strings.Split(hand, " ") {
 			if card, err := NewCard(cardname); err != nil {
 				return nil, err
 			} else {
-				if _, ok := allcards[card]; ok {
-					return nil, errors.New("duplicate card")
-				} else {
-					allcards[card] = struct{}{}
-				}
 				cards = append(cards, card)
 			}
 		}
