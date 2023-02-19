@@ -1,32 +1,30 @@
 package ocr
 
 import (
-	"fmt"
 	"strings"
 )
 
-func Recognize(s string) []string {
-	if len(s) > 0 && s[0] == '\n' {
-		s = s[1:]
-	}
-	result := []string{}
-	fmt.Println("*****input:", s, "***")
-	lines := strings.Split(s, "\n")
-	fmt.Println("***number of lines:", len(lines))
-	if len(lines)%4 != 0 {
-		panic("lines not multiples of four")
-	}
-	for i := 0; len(lines) > 0; i += 4 {
-		rowofdigits := [4]string{lines[i], lines[i+1], lines[i+2], lines[i+3]}
-		lines = lines[4:]
-		result = append(result, readLine(rowofdigits))
-	}
-	return result
+var digits = map[[4][3]rune]string{
+	{{' ', '_', ' '}, {'|', ' ', '|'}, {'|', '_', '|'}, {' ', ' ', ' '}}: "0",
+	{{' ', ' ', ' '}, {' ', ' ', '|'}, {' ', ' ', '|'}, {' ', ' ', ' '}}: "1",
+	{{' ', '_', ' '}, {' ', '_', '|'}, {'|', '_', ' '}, {' ', ' ', ' '}}: "2",
+	{{' ', '_', ' '}, {' ', '_', '|'}, {' ', '_', '|'}, {' ', ' ', ' '}}: "3",
+	{{' ', ' ', ' '}, {'|', '_', '|'}, {' ', ' ', '|'}, {' ', ' ', ' '}}: "4",
+	{{' ', '_', ' '}, {'|', '_', ' '}, {' ', '_', '|'}, {' ', ' ', ' '}}: "5",
+	{{' ', '_', ' '}, {'|', '_', ' '}, {'|', '_', '|'}, {' ', ' ', ' '}}: "6",
+	{{' ', '_', ' '}, {' ', ' ', '|'}, {' ', ' ', '|'}, {' ', ' ', ' '}}: "7",
+	{{' ', '_', ' '}, {'|', '_', '|'}, {'|', '_', '|'}, {' ', ' ', ' '}}: "8",
+	{{' ', '_', ' '}, {'|', '_', '|'}, {' ', '_', '|'}, {' ', ' ', ' '}}: "9",
 }
 
-func readLine(s [4]string) string {
-	digits := ""
+func recognizeDigit(ds [4][3]rune) string {
+	if d, ok := digits[ds]; ok {
+		return d
+	}
+	return "?"
+}
 
+func readLine(s [4]string) (digits string) {
 	// create rune matrix
 	chars := make([][]rune, 4)
 	var linelen int
@@ -54,13 +52,20 @@ func readLine(s [4]string) string {
 	return digits
 }
 
-func recognizeDigit(ds [4][3]rune) string {
-	if d, ok := digits[ds]; ok {
-		return d
+func Recognize(s string) []string {
+	if len(s) == 0 {
+		return nil
 	}
-	return "?"
-}
 
-var digits = map[[4][3]rune]string{
-	{{' ', '_', ' '}, {'|', ' ', '|'}, {'|', '_', '|'}, {' ', ' ', ' '}}: "0",
+	lines := strings.Split(s[1:], "\n") // ignore the leading newline
+	if len(lines)%4 != 0 {
+		panic("lines not multiples of four")
+	}
+
+	result := []string{}
+	for len(lines) > 0 {
+		result = append(result, readLine([4]string(lines[:4])))
+		lines = lines[4:]
+	}
+	return result
 }
